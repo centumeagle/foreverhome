@@ -163,7 +163,16 @@ const Index = () => {
                 <RefreshCw className={`w-4 h-4 ${fetching ? 'animate-spin' : ''}`} />
                 데이터 업데이트
               </Button>
-              <Button variant="link" className="gap-1 text-primary">
+              <Button 
+                variant="link" 
+                className="gap-1 text-primary"
+                onClick={() => {
+                  const animalsSection = document.getElementById('animals');
+                  if (animalsSection) {
+                    animalsSection.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              >
                 모두 보기
                 <ArrowIcon className="w-4 h-4" />
               </Button>

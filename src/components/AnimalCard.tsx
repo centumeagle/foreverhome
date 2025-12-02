@@ -2,6 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Heart, MapPin } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface Animal {
   id: string;
@@ -129,9 +130,11 @@ const AnimalCard = ({ animal, index }: AnimalCardProps) => {
           </div>
         </div>
         
-        <Button className="w-full" variant="default">
-          자세히 보기
-        </Button>
+        <Link to={`/animal/${animal.id}`}>
+          <Button className="w-full" variant="default">
+            자세히 보기
+          </Button>
+        </Link>
       </CardContent>
     </Card>
   );

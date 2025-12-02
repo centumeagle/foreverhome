@@ -2,6 +2,12 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Heart } from 'lucide-react';
 
 const HeroSection = () => {
+  const scrollToAnimals = () => {
+    const animalsSection = document.getElementById('animals');
+    if (animalsSection) {
+      animalsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
   return (
     <section className="bg-background py-12 md:py-20">
       <div className="container mx-auto px-4">
@@ -23,11 +29,19 @@ const HeroSection = () => {
             </p>
             
             <div className="flex flex-wrap gap-4">
-              <Button size="lg" className="gap-2">
+              <Button 
+                size="lg" 
+                className="gap-2"
+                onClick={scrollToAnimals}
+              >
                 친구들 만나러 가기
                 <ArrowRight className="w-4 h-4" />
               </Button>
-              <Button variant="outline" size="lg">
+              <Button 
+                variant="outline" 
+                size="lg"
+                onClick={scrollToAnimals}
+              >
                 입양 절차 안내
               </Button>
             </div>

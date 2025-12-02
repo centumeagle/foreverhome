@@ -1,7 +1,23 @@
 import { Button } from '@/components/ui/button';
 import { PawPrint } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const Header = () => {
+  const { toast } = useToast();
+
+  const handleLogin = () => {
+    toast({
+      title: '로그인',
+      description: '로그인 기능은 준비 중입니다.',
+    });
+  };
+
+  const handleSignup = () => {
+    toast({
+      title: '회원가입',
+      description: '회원가입 기능은 준비 중입니다.',
+    });
+  };
   return (
     <header className="bg-card border-b border-border sticky top-0 z-50">
       <div className="container mx-auto px-4">
@@ -21,8 +37,16 @@ const Header = () => {
           </nav>
           
           <div className="flex items-center gap-3">
-            <Button variant="ghost" className="hidden sm:inline-flex">로그인</Button>
-            <Button>회원가입</Button>
+            <Button 
+              variant="ghost" 
+              className="hidden sm:inline-flex"
+              onClick={handleLogin}
+            >
+              로그인
+            </Button>
+            <Button onClick={handleSignup}>
+              회원가입
+            </Button>
           </div>
         </div>
       </div>
