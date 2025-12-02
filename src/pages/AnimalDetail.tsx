@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Phone, MapPin, Heart } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { useWishlist } from '@/hooks/useWishlist';
 import Header from '@/components/Header';
 
 interface Animal {
@@ -32,8 +34,12 @@ const AnimalDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { toggleWishlist, isInWishlist } = useWishlist();
   const [animal, setAnimal] = useState<Animal | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const isWishlisted = animal ? isInWishlist(animal.id) : false;
 
   useEffect(() => {
     const fetchAnimal = async () => {
@@ -62,6 +68,26 @@ const AnimalDetail = () => {
 
     fetchAnimal();
   }, [id, toast]);
+
+  const handleWishlistToggle = async () => {
+    if (!user) {
+      toast({
+        title: '로그인 필요',
+        description: '찜하기 기능을 사용하려면 로그인해주세요.',
+      });
+      return;
+    }
+
+    if (!animal) return;
+
+    const success = await toggleWishlist(animal.id);
+    if (success) {
+      toast({
+        title: isWishlisted ? '찜 목록에서 제거' : '찜 목록에 추가',
+        description: isWishlisted ? '찜 목록에서 제거되었습니다.' : '찜 목록에 추가되었습니다.',
+      });
+    }
+  };
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return '정보 없음';
@@ -120,21 +146,21 @@ const AnimalDetail = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-4 py-6 md:py-8 max-w-7xl">
         {/* Back button */}
         <Button 
           variant="ghost" 
           onClick={() => navigate('/')}
-          className="mb-6 gap-2"
+          className="mb-4 md:mb-6 gap-2 h-11"
         >
           <ArrowLeft className="w-4 h-4" />
           목록으로
         </Button>
 
         {/* Main content */}
-        <div className="bg-card rounded-2xl overflow-hidden shadow-lg">
+        <div className="bg-card rounded-2xl overflow-hidden shadow-lg max-w-4xl mx-auto">
           {/* Image */}
-          <div className="relative w-full aspect-video bg-muted">
+          <div className="relative w-full aspect-square md:aspect-video bg-muted">
             {animal.popfile ? (
               <img
                 src={animal.popfile}
@@ -147,54 +173,54 @@ const AnimalDetail = () => {
               </div>
             )}
             <div className="absolute top-4 right-4">
-              <Badge className="bg-success text-white text-base px-4 py-1">
+              <Badge className="bg-success text-white text-sm md:text-base px-3 md:px-4 py-1">
                 보호중
               </Badge>
             </div>
           </div>
 
           {/* Content */}
-          <div className="p-8">
+          <div className="p-4 md:p-8">
             {/* Category */}
-            <div className="mb-4">
+            <div className="mb-2 md:mb-4">
               <span className="text-sm text-muted-foreground">{getCategory(animal.kindcd)}</span>
             </div>
 
             {/* ID */}
-            <h1 className="text-3xl font-bold text-foreground mb-8">{animal.desertionno}</h1>
+            <h1 className="text-xl md:text-3xl font-bold text-foreground mb-6 md:mb-8">{animal.desertionno}</h1>
 
             {/* Info sections */}
-            <div className="space-y-8">
+            <div className="space-y-6 md:space-y-8">
               {/* Basic Info */}
               <div>
-                <h2 className="text-lg font-bold text-foreground mb-4 pb-2 border-b border-border">
+                <h2 className="text-base md:text-lg font-bold text-foreground mb-3 md:mb-4 pb-2 border-b border-border">
                   기본 정보
                 </h2>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3 md:gap-4">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">유기번호</p>
-                    <p className="text-foreground">{animal.desertionno}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground mb-1">유기번호</p>
+                    <p className="text-sm md:text-base text-foreground">{animal.desertionno}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">접수일</p>
-                    <p className="text-foreground">{formatDate(animal.happendt)}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground mb-1">접수일</p>
+                    <p className="text-sm md:text-base text-foreground">{formatDate(animal.happendt)}</p>
                   </div>
                 </div>
               </div>
 
               {/* Status Info */}
               <div>
-                <h2 className="text-lg font-bold text-foreground mb-4 pb-2 border-b border-border">
+                <h2 className="text-base md:text-lg font-bold text-foreground mb-3 md:mb-4 pb-2 border-b border-border">
                   상태 정보
                 </h2>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3 md:gap-4">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">상태</p>
-                    <p className="text-foreground">{animal.processstate || '정보 없음'}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground mb-1">상태</p>
+                    <p className="text-sm md:text-base text-foreground">{animal.processstate || '정보 없음'}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">중성화</p>
-                    <p className="text-foreground flex items-center gap-2">
+                    <p className="text-xs md:text-sm text-muted-foreground mb-1">중성화</p>
+                    <p className="text-sm md:text-base text-foreground flex items-center gap-2">
                       {getNeuterText(animal.neuteryn) === '완료' && (
                         <span className="text-success">⭕</span>
                       )}
@@ -202,52 +228,52 @@ const AnimalDetail = () => {
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">공고번호</p>
-                    <p className="text-foreground">{animal.desertionno}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground mb-1">공고번호</p>
+                    <p className="text-sm md:text-base text-foreground">{animal.desertionno}</p>
                   </div>
                 </div>
               </div>
 
               {/* Physical Info */}
               <div>
-                <h2 className="text-lg font-bold text-foreground mb-4 pb-2 border-b border-border">
+                <h2 className="text-base md:text-lg font-bold text-foreground mb-3 md:mb-4 pb-2 border-b border-border">
                   품종
                 </h2>
-                <p className="text-foreground mb-6">{getBreedName(animal.kindcd)}</p>
+                <p className="text-sm md:text-base text-foreground mb-4 md:mb-6">{getBreedName(animal.kindcd)}</p>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3 md:gap-4">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">나이</p>
-                    <p className="text-foreground">{animal.age || '미상'}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground mb-1">나이</p>
+                    <p className="text-sm md:text-base text-foreground">{animal.age || '미상'}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">체중</p>
-                    <p className="text-foreground">{animal.weight || '미상'}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground mb-1">체중</p>
+                    <p className="text-sm md:text-base text-foreground">{animal.weight || '미상'}</p>
                   </div>
                 </div>
                 
-                <div className="mt-4">
-                  <p className="text-sm text-muted-foreground mb-1">색상</p>
-                  <p className="text-foreground">{animal.colorcd || '정보 없음'}</p>
+                <div className="mt-3 md:mt-4">
+                  <p className="text-xs md:text-sm text-muted-foreground mb-1">색상</p>
+                  <p className="text-sm md:text-base text-foreground">{animal.colorcd || '정보 없음'}</p>
                 </div>
               </div>
 
               {/* Discovery Info */}
               <div>
-                <h2 className="text-lg font-bold text-foreground mb-4 pb-2 border-b border-border">
+                <h2 className="text-base md:text-lg font-bold text-foreground mb-3 md:mb-4 pb-2 border-b border-border">
                   발견 정보
                 </h2>
-                <div className="space-y-4">
+                <div className="space-y-3 md:space-y-4">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
+                    <p className="text-xs md:text-sm text-muted-foreground mb-1 flex items-center gap-1">
                       <MapPin className="w-4 h-4" />
                       발견장소
                     </p>
-                    <p className="text-foreground">{animal.happenplace || '정보 없음'}</p>
+                    <p className="text-sm md:text-base text-foreground">{animal.happenplace || '정보 없음'}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">공고기간</p>
-                    <p className="text-foreground">
+                    <p className="text-xs md:text-sm text-muted-foreground mb-1">공고기간</p>
+                    <p className="text-sm md:text-base text-foreground">
                       {formatDate(animal.noticesdt)} ~ {formatDate(animal.noticeedt)}
                     </p>
                   </div>
@@ -257,62 +283,63 @@ const AnimalDetail = () => {
               {/* Special Mark */}
               {animal.specialmark && (
                 <div>
-                  <h2 className="text-lg font-bold text-foreground mb-4 pb-2 border-b border-border">
+                  <h2 className="text-base md:text-lg font-bold text-foreground mb-3 md:mb-4 pb-2 border-b border-border">
                     특징
                   </h2>
-                  <p className="text-foreground leading-relaxed">{animal.specialmark}</p>
+                  <p className="text-sm md:text-base text-foreground leading-relaxed">{animal.specialmark}</p>
                 </div>
               )}
 
               {/* Shelter Info */}
               <div>
-                <h2 className="text-lg font-bold text-foreground mb-4 pb-2 border-b border-border">
+                <h2 className="text-base md:text-lg font-bold text-foreground mb-3 md:mb-4 pb-2 border-b border-border">
                   보호소 정보
                 </h2>
-                <div className="bg-warm-beige/30 rounded-xl p-6 space-y-3">
+                <div className="bg-secondary/30 rounded-xl p-4 md:p-6 space-y-3">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">보호소명</p>
-                    <p className="text-foreground font-medium">{animal.carenm || '정보 없음'}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground mb-1">보호소명</p>
+                    <p className="text-sm md:text-base text-foreground font-medium">{animal.carenm || '정보 없음'}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
+                    <p className="text-xs md:text-sm text-muted-foreground mb-1 flex items-center gap-1">
                       <Phone className="w-4 h-4" />
                       전화번호
                     </p>
                     <a 
                       href={`tel:${animal.caretel}`}
-                      className="text-primary hover:underline font-medium"
+                      className="text-sm md:text-base text-primary hover:underline font-medium"
                     >
                       {animal.caretel || '정보 없음'}
                     </a>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">주소</p>
-                    <p className="text-foreground">{animal.careaddr || '정보 없음'}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground mb-1">주소</p>
+                    <p className="text-sm md:text-base text-foreground">{animal.careaddr || '정보 없음'}</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Action buttons */}
-            <div className="flex gap-4 mt-8">
+            <div className="flex gap-3 md:gap-4 mt-6 md:mt-8">
               <Button 
-                className="flex-1 h-14 text-lg"
+                className="flex-1 h-12 md:h-14 text-sm md:text-lg"
                 onClick={() => {
                   if (animal.caretel) {
                     window.location.href = `tel:${animal.caretel}`;
                   }
                 }}
               >
-                <Phone className="w-5 h-5 mr-2" />
+                <Phone className="w-4 md:w-5 h-4 md:h-5 mr-2" />
                 입양 문의하기
               </Button>
               <Button 
                 variant="outline" 
                 size="lg"
-                className="h-14 px-6"
+                className="h-12 md:h-14 px-4 md:px-6"
+                onClick={handleWishlistToggle}
               >
-                <Heart className="w-5 h-5" />
+                <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-badge-female text-badge-female' : ''}`} />
               </Button>
             </div>
           </div>
@@ -320,8 +347,8 @@ const AnimalDetail = () => {
       </div>
 
       {/* Footer */}
-      <footer className="bg-card border-t border-border py-8 mt-12">
-        <div className="container mx-auto px-4 text-center text-muted-foreground text-sm">
+      <footer className="bg-card border-t border-border py-8 mt-8 md:mt-12">
+        <div className="container mx-auto px-4 max-w-7xl text-center text-muted-foreground text-sm">
           <p>© 2024 포에버홈. 모든 생명은 소중합니다.</p>
         </div>
       </footer>

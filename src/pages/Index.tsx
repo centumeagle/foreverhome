@@ -140,15 +140,15 @@ const Index = () => {
       <HeroSection />
       
       {/* Animals Section */}
-      <section id="animals" className="py-12 md:py-16">
-        <div className="container mx-auto px-4">
+      <section id="animals" className="py-10 md:py-16">
+        <div className="container mx-auto px-4 max-w-7xl">
           {/* Section Header */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+              <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground mb-2">
                 가족을 기다리고 있어요
               </h2>
-              <p className="text-muted-foreground">
+              <p className="text-sm md:text-base text-muted-foreground">
                 새로운 삶을 함께할 평생 가족을 찾습니다.
               </p>
             </div>
@@ -158,40 +158,27 @@ const Index = () => {
                 variant="ghost" 
                 onClick={updateData} 
                 disabled={fetching}
-                className="gap-2"
+                className="gap-2 h-11"
               >
                 <RefreshCw className={`w-4 h-4 ${fetching ? 'animate-spin' : ''}`} />
-                데이터 업데이트
-              </Button>
-              <Button 
-                variant="link" 
-                className="gap-1 text-primary"
-                onClick={() => {
-                  const animalsSection = document.getElementById('animals');
-                  if (animalsSection) {
-                    animalsSection.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
-              >
-                모두 보기
-                <ArrowIcon className="w-4 h-4" />
+                <span className="hidden sm:inline">데이터 업데이트</span>
               </Button>
             </div>
           </div>
 
           {/* Category Tabs */}
           <Tabs value={selectedCategory} onValueChange={(v) => setSelectedCategory(v as any)} className="mb-8">
-            <TabsList className="bg-secondary/50 p-1">
-              <TabsTrigger value="all" className="data-[state=active]:bg-card data-[state=active]:shadow-sm">
+            <TabsList className="bg-secondary/50 p-1 h-auto flex-wrap">
+              <TabsTrigger value="all" className="data-[state=active]:bg-card data-[state=active]:shadow-sm h-10 px-4">
                 전체 ({animals.length})
               </TabsTrigger>
-              <TabsTrigger value="dog" className="data-[state=active]:bg-card data-[state=active]:shadow-sm">
+              <TabsTrigger value="dog" className="data-[state=active]:bg-card data-[state=active]:shadow-sm h-10 px-4">
                 강아지 ({dogCount})
               </TabsTrigger>
-              <TabsTrigger value="cat" className="data-[state=active]:bg-card data-[state=active]:shadow-sm">
+              <TabsTrigger value="cat" className="data-[state=active]:bg-card data-[state=active]:shadow-sm h-10 px-4">
                 고양이 ({catCount})
               </TabsTrigger>
-              <TabsTrigger value="other" className="data-[state=active]:bg-card data-[state=active]:shadow-sm">
+              <TabsTrigger value="other" className="data-[state=active]:bg-card data-[state=active]:shadow-sm h-10 px-4">
                 기타 ({otherCount})
               </TabsTrigger>
             </TabsList>
@@ -200,15 +187,15 @@ const Index = () => {
           {filteredAnimals.length === 0 ? (
             <div className="bg-card rounded-2xl p-12 text-center shadow-sm">
               <p className="text-muted-foreground mb-4">등록된 동물 정보가 없습니다.</p>
-              <Button onClick={updateData} disabled={fetching}>
+              <Button onClick={updateData} disabled={fetching} className="h-11">
                 <RefreshCw className={`w-4 h-4 mr-2 ${fetching ? 'animate-spin' : ''}`} />
                 데이터 가져오기
               </Button>
             </div>
           ) : (
             <>
-              {/* Animal Cards Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-10">
+              {/* Animal Cards Grid - Responsive */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10">
                 {currentAnimals.map((animal, index) => (
                   <AnimalCard 
                     key={animal.id} 
@@ -220,23 +207,23 @@ const Index = () => {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-3">
+                <div className="flex items-center justify-center gap-2 md:gap-3">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                    className="gap-1"
+                    className="gap-1 h-11 px-3 md:px-4"
                   >
                     <ChevronLeft className="w-4 h-4" />
-                    이전
+                    <span className="hidden sm:inline">이전</span>
                   </Button>
                   
-                  <div className="flex items-center gap-2 px-4">
+                  <div className="flex items-center gap-2 px-2 md:px-4">
                     <span className="text-sm font-medium text-foreground">
                       {currentPage} / {totalPages}
                     </span>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-sm text-muted-foreground hidden sm:inline">
                       ({filteredAnimals.length}마리)
                     </span>
                   </div>
@@ -246,9 +233,9 @@ const Index = () => {
                     size="sm"
                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
-                    className="gap-1"
+                    className="gap-1 h-11 px-3 md:px-4"
                   >
-                    다음
+                    <span className="hidden sm:inline">다음</span>
                     <ChevronRight className="w-4 h-4" />
                   </Button>
                 </div>
@@ -260,7 +247,7 @@ const Index = () => {
       
       {/* Footer */}
       <footer className="bg-card border-t border-border py-8">
-        <div className="container mx-auto px-4 text-center text-muted-foreground text-sm">
+        <div className="container mx-auto px-4 max-w-7xl text-center text-muted-foreground text-sm">
           <p>© 2024 포에버홈. 모든 생명은 소중합니다.</p>
         </div>
       </footer>

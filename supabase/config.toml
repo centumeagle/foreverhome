@@ -1,1 +1,7 @@
 project_id = "ykshtpgjzzmyxacylkwq"
+
+[functions.fetch-animals]
+verify_jwt = false
+
+[functions.ai-recommend]
+verify_jwt = false

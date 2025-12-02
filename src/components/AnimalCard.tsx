@@ -3,6 +3,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Heart, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { useWishlist } from '@/hooks/useWishlist';
+import { useToast } from '@/hooks/use-toast';
 
 interface Animal {
   id: string;
@@ -31,6 +34,32 @@ interface AnimalCardProps {
 }
 
 const AnimalCard = ({ animal, index }: AnimalCardProps) => {
+  const { user } = useAuth();
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const { toast } = useToast();
+  const isWishlisted = isInWishlist(animal.id);
+
+  const handleWishlistToggle = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!user) {
+      toast({
+        title: '로그인 필요',
+        description: '찜하기 기능을 사용하려면 로그인해주세요.',
+      });
+      return;
+    }
+
+    const success = await toggleWishlist(animal.id);
+    if (success) {
+      toast({
+        title: isWishlisted ? '찜 목록에서 제거' : '찜 목록에 추가',
+        description: isWishlisted ? '찜 목록에서 제거되었습니다.' : '찜 목록에 추가되었습니다.',
+      });
+    }
+  };
+
   const getSexText = (sex: string | null) => {
     if (!sex) return '미상';
     return sex === 'M' ? '남아' : sex === 'F' ? '여아' : '미상';
@@ -56,13 +85,11 @@ const AnimalCard = ({ animal, index }: AnimalCardProps) => {
 
   const getBreedName = (kindcd: string | null) => {
     if (!kindcd) return '품종 미상';
-    // Remove [개], [고양이] prefix and return breed
     return kindcd.replace(/^\[(개|고양이|기타축종)\]\s*/, '') || '품종 미상';
   };
 
   const getLocationShort = (carenm: string | null) => {
     if (!carenm) return '위치 미상';
-    // Shorten the location name
     const parts = carenm.split(' ');
     return parts.slice(0, 2).join(' ');
   };
@@ -95,14 +122,23 @@ const AnimalCard = ({ animal, index }: AnimalCardProps) => {
         </div>
         
         {/* Favorite button */}
-        <button className="absolute top-3 right-3 w-9 h-9 bg-card/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-card transition-colors">
-          <Heart className="w-5 h-5 text-muted-foreground hover:text-badge-female transition-colors" />
+        <button 
+          onClick={handleWishlistToggle}
+          className="absolute top-3 right-3 w-11 h-11 bg-card/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-card transition-colors"
+        >
+          <Heart 
+            className={`w-5 h-5 transition-colors ${
+              isWishlisted 
+                ? 'text-badge-female fill-badge-female' 
+                : 'text-muted-foreground hover:text-badge-female'
+            }`} 
+          />
         </button>
       </div>
       
       <CardContent className="p-4 space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="font-bold text-lg text-foreground">
+          <h3 className="font-bold text-base md:text-lg text-foreground truncate">
             {getBreedName(animal.kindcd)}
           </h3>
           <Badge className={getSexBadgeClass(animal.sexcd)}>
@@ -111,7 +147,7 @@ const AnimalCard = ({ animal, index }: AnimalCardProps) => {
         </div>
         
         <div className="flex items-center gap-1 text-sm text-muted-foreground">
-          <MapPin className="w-4 h-4" />
+          <MapPin className="w-4 h-4 flex-shrink-0" />
           <span className="truncate">{getLocationShort(animal.carenm)}</span>
         </div>
         
@@ -131,7 +167,7 @@ const AnimalCard = ({ animal, index }: AnimalCardProps) => {
         </div>
         
         <Link to={`/animal/${animal.id}`}>
-          <Button className="w-full" variant="default">
+          <Button className="w-full h-11" variant="default">
             자세히 보기
           </Button>
         </Link>
