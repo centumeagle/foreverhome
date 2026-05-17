@@ -40,14 +40,36 @@ const AIRecommendModal = ({ open, onOpenChange }: AIRecommendModalProps) => {
     setRecommendation('');
 
     try {
-      const { data, error } = await supabase.functions.invoke('ai-recommend', {
-        body: { userInput }
-      });
+      const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+      if (!GEMINI_API_KEY) {
+        throw new Error('VITE_GEMINI_API_KEY가 .env에 설정되지 않았습니다.');
+      }
 
-      if (error) throw error;
+      const systemPrompt = "당신은 동물 보호소 상담사입니다. 사용자의 환경을 분석하여 적합한 반려동물을 추천하고 따뜻한 말투로 조언해주세요. 한국어로 응답해주세요.";
 
-      if (data?.recommendation) {
-        setRecommendation(data.recommendation);
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{ text: `${systemPrompt}\n\n사용자 정보:\n${userInput}\n\n위 정보를 바탕으로 적합한 반려동물 종류와 품종을 추천하고, 양육 시 주의사항과 조언을 친절하게 알려주세요.` }]
+            }],
+            generationConfig: { temperature: 0.7, maxOutputTokens: 1024 }
+          })
+        }
+      );
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Gemini API 오류: ${response.status} ${errText}`);
+      }
+
+      const data = await response.json();
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (text) {
+        setRecommendation(text);
       } else {
         throw new Error('추천 결과를 받지 못했습니다.');
       }
