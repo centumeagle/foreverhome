@@ -32,7 +32,7 @@ serve(async (req) => {
     const systemPrompt = "당신은 동물 보호소 상담사입니다. 사용자의 환경을 분석하여 적합한 반려동물을 추천하고 따뜻한 말투로 조언해주세요. 한국어로 응답해주세요.";
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: {

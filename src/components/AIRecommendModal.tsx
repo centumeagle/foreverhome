@@ -48,7 +48,7 @@ const AIRecommendModal = ({ open, onOpenChange }: AIRecommendModalProps) => {
       const systemPrompt = "당신은 동물 보호소 상담사입니다. 사용자의 환경을 분석하여 적합한 반려동물을 추천하고 따뜻한 말투로 조언해주세요. 한국어로 응답해주세요.";
 
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -77,7 +77,7 @@ const AIRecommendModal = ({ open, onOpenChange }: AIRecommendModalProps) => {
       console.error('AI recommendation error:', error);
       toast({
         title: '오류',
-        description: 'AI 추천을 받는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+        description: error instanceof Error ? error.message : 'AI 추천을 받는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
         variant: 'destructive',
       });
     } finally {
